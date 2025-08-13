@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Rolling Dice</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+        }
+        .dice-container {
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+        .dice {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+        }
+        .face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #fff;
+            border: 2px solid #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        /* Position each face in 3D space */
+        .front  { transform: translateZ(50px); }
+        .back   { transform: rotateY(180deg) translateZ(50px); }
+        .right  { transform: rotateY(90deg) translateZ(50px); }
+        .left   { transform: rotateY(-90deg) translateZ(50px); }
+        .top    { transform: rotateX(90deg) translateZ(50px); }
+        .bottom { transform: rotateX(-90deg) translateZ(50px); }
+        /* Dot styling for dice faces */
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+        }
+        /* Dot positions for each number */
+        .face-1 .dot:nth-child(1) { top: 44px; left: 44px; }
+        .face-2 .dot:nth-child(1) { top: 20px; left: 20px; }
+        .face-2 .dot:nth-child(2) { top: 68px; left: 68px; }
+        .face-3 .dot:nth-child(1) { top: 20px; left: 20px; }
+        .face-3 .dot:nth-child(2) { top: 44px; left: 44px; }
+        .face-3 .dot:nth-child(3) { top: 68px; left: 68px; }
+        .face-4 .dot:nth-child(1) { top: 20px; left: 20px; }
+        .face-4 .dot:nth-child(2) { top: 20px; left: 68px; }
+        .face-4 .dot:nth-child(3) { top: 68px; left: 20px; }
+        .face-4 .dot:nth-child(4) { top: 68px; left: 68px; }
+        .face-5 .dot:nth-child(1) { top: 20px; left: 20px; }
+        .face-5 .dot:nth-child(2) { top: 20px; left: 68px; }
+        .face-5 .dot:nth-child(3) { top: 44px; left: 44px; }
+        .face-5 .dot:nth-child(4) { top: 68px; left: 20px; }
+        .face-5 .dot:nth-child(5) { top: 68px; left: 68px; }
+        .face-6 .dot:nth-child(1) { top: 20px; left: 20px; }
+        .face-6 .dot:nth-child(2) { top: 20px; left: 44px; }
+        .face-6 .dot:nth-child(3) { top: 20px; left: 68px; }
+        .face-6 .dot:nth-child(4) { top: 68px; left: 20px; }
+        .face-6 .dot:nth-child(5) { top: 68px; left: 44px; }
+        .face-6 .dot:nth-child(6) { top: 68px; left: 68px; }
+        /* Rolling animation */
+        .rolling {
+            animation: roll 1s infinite;
+        }
+        @keyframes roll {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+        /* Result display */
+        #result {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dice-container">
+        <div class="dice" id="dice">
+            <div class="face front face-1"><div class="dot"></div></div>
+            <div class="face back face-2"><div class="dot"></div><div class="dot"></div></div>
+            <div class="face right face-3"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="face left face-4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="face top face-5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="face bottom face-6"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+    </div>
+    <div id="result">Roll the dice!</div>
+
+    <script>
+        const dice = document.getElementById('dice');
+        const resultDisplay = document.getElementById('result');
+        const faces = [
+            { number: 1, transform: 'rotateX(0deg) rotateY(0deg)' },      // Front
+            { number: 2, transform: 'rotateY(180deg)' },                  // Back
+            { number: 3, transform: 'rotateY(90deg)' },                   // Right
+            { number: 4, transform: 'rotateY(-90deg)' },                  // Left
+            { number: 5, transform: 'rotateX(-90deg)' },                   // Top
+            { number: 6, transform: 'rotateX(90deg)' }                   // Bottom
+        ];
+
+        function rollDice() {
+            // Start rolling animation
+            dice.classList.add('rolling');
+            resultDisplay.textContent = 'Rolling...';
+
+            // Stop rolling after 1 second
+            setTimeout(() => {
+                dice.classList.remove('rolling');
+                // Randomly select a face
+                const randomFace = faces[Math.floor(Math.random() * faces.length)];
+                dice.style.transform = randomFace.transform;
+                resultDisplay.textContent =` Result: ${randomFace.number}`;
+
+                // Pause for 2 seconds, then roll again
+                setTimeout(rollDice, 2000);
+            }, 1000);
+        }
+
+        // Start the rolling cycle
+        rollDice();
+    </script>
+</body>
+</html>
